@@ -130,10 +130,16 @@ module BowerRails
           # Replace relative paths in URLs with Rails asset_path helper
           new_contents = contents.gsub(url_regex) do |match|
             relative_path = $1
-            image_path = directory_path.join(relative_path).cleanpath
-            puts "#{match} => #{image_path}"
 
-            "url(<%= asset_path '#{image_path}' %>)"
+            if /^url\(\s*['"]?\/\// =~ match
+              puts "skip #{match}"
+              match
+            else
+              image_path = directory_path.join(relative_path).cleanpath
+              puts "#{match} => #{image_path}"
+
+              "url(<%= asset_path '#{image_path}' %>)"
+            end
           end
 
           # Replace CSS with ERB CSS file with resolved asset paths
